@@ -63,7 +63,16 @@ app.post('/api/movies', async (req, res) => {
 // GET /api/movies
 app.get('/api/movies', async (req, res) => {
     try {
-        const { page, perPage, title } = req.query;
+        let { page, perPage, title } = req.query;
+
+        // Validate that page and perPage are valid numbers
+        page = parseInt(page, 10);
+        perPage = parseInt(perPage, 10);
+
+        if (isNaN(page) || isNaN(perPage)) {
+            return res.status(400).json({ error: 'Invalid page or perPage parameters' });
+        }
+
         const movies = await db.getAllMovies(page, perPage, title);
         res.status(200).json(movies);
     } catch (error) {
@@ -71,6 +80,7 @@ app.get('/api/movies', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
 
 // GET /api/movies/:id
 app.get('/api/movies/:id', async (req, res) => {
